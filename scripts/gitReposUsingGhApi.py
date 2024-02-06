@@ -17,7 +17,52 @@ def removeTimestamp(df):
     #save without Timestamp in df
     for i in range(len(df.iloc[:,0])):
         df.iloc[i:,0]=a[i]
-        
+def viewsData(reponame):
+    #views data
+    print("Project Name:",reponame)
+    url='gh api repos/' +username+ '/' +reponame+ '/traffic/views --method GET > ../jsonOutput/jasonUpdateData/' +reponame+ '.json'
+    os.system(url)
+
+    #create json and csv files
+    f= open('../jsonOutput/jsonUpdatedata/' +reponame+ '.json')
+    JsonData = json.load(f)
+    df = pd.DataFrame(JsonData['views'])
+    df.to_csv("../csvOutput/csvUpdatedata/" +reponame+".csv", mode='a', index=False, header=False)
+    f.close
+
+def cloneData(reponame):
+    #clone data
+    viewsData(reponame)
+
+    print("Project Name:",reponame)
+    url='gh api repos/' +username+ '/' +reponame+ '/traffic/clones --method GET > ../jsonOutput/jasonCloneData/' +reponame+ '.json'
+    os.system(url)
+
+    #create json and csv files
+    f= open('../jsonOutput/jsonCloneData/' +reponame+ '.json')
+    JsonData = json.load(f)
+    df = pd.DataFrame(JsonData['clones'])
+    df.to_csv("../csvOutput/csvCloneData/" +reponame+".csv", mode='a', index=False, header=False)
+    f.close
+
+    #csv to dictinory
+    csv_name="../csvOutput/csvCloneData/"+reponame+".csv"
+    old_csv="../csvOutput/"+reponame+".csv"
+    try:
+        data=pd.read_csv(csv_name,headrer=None)
+        oldData=pd.read_csv(old_csv,header=None)
+        newdata=pd.merge(olddata,data)
+        removeTimestamp(newCleanData)
+        removePath="rm "+old_csv
+        os.system(removePath)
+        newCleanData.to_csv("../csvOutput/"+reponame+".csv", mode='a', index=False, header=False)
+    except:
+        print("No clones",reponame)
+
+        os.system("rm ../csvOuput/csvCloneData/*")
+        os.system("rm ../jsonOutput/jsonCloneData/*")
+
+
 def updateData(reponame):
     #update data
     print("Project Name:",reponame)
