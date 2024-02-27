@@ -4,6 +4,7 @@ import os
 import pandas as pd
 from datetime import date,timedelta
 import time
+import math
 
 def zeroesToEmptyFile(reponame,flag):
     a=[]
@@ -34,7 +35,7 @@ def merge_csv(reponame):
     
     data = pd.read_csv(csv_name,header=None)
     oldData = pd.read_csv(old_csv_name,header=None)
-    newdata=pd.merge(oldData,data)
+    newdata=pd.concat([oldData,data])
     newCleanData=newdata.drop_duplicates(keep='last')
     removePath="rm "+old_csv_name
     os.system(removePath)
@@ -50,23 +51,26 @@ def updateRefData(reponame):
     f=open('../jsonRefOutput/' +reponame+ '.json')
     JsonData=json.load(f)
    # print(JsonData)
-   # temp=enumerate(JsonData)
-    for i, value in (enumerate(JsonData)):
-        df= pd.DataFrame(JsonData)
-        df.to_csv("../csvRefOutput/csvRefUpdateData" +reponame+".csv", mode='a', index=True, header=False)
-        f.close()
+    temp=enumerate(JsonData)
+       # print(i)
+    df= pd.DataFrame(list(temp))
+        #print(df)
+    df.to_csv("../csvRefOutput/csvRefUpdateData" +reponame+".csv", mode='a', index=False, header=False)
+   # print(df)
+    f.close()
     
-        if(os.stat(csv_name).st_size == 0):
-            print("empty file",reponame)
-            zeroesToEmptyFile(reponame,flag)
-    #time.sleep(10)
-        df=pd.read_csv(old_csv_name,header=None)
-   # df=removeTimestamp(df) 
-        removePath="rm "+csv_name
-        os.system(removePath)
-        df.to_csv("../csvRefOutput/csvRefUpdateData/" +reponame+".csv", mode='a', index=True, header=False)
-    #print("removed timestamp")
-        merge_csv(reponame)
+    if(os.stat(old_csv_name).st_size == 0):
+        print("empty file",reponame)
+        zeroesToEmptyFile(reponame,flag)
+   # time.sleep(10)
+    df=pd.read_csv(old_csv_name,header=None)
+    #df=removeTimestamp(df) 
+    removePath="rm "+csv_name
+    os.system(removePath)
+    df.to_csv("../csvRefOutput/csvRefUpdateData/" +reponame+".csv", mode='a', index=False, header=False)
+   # print("removed timestamp")
+    merge_csv(reponame)
+    #print("after merge")
     
 
 def freshRefData(reponame):
@@ -78,11 +82,11 @@ def freshRefData(reponame):
     f=open('../jsonRefOutput/' +reponame+ '.json')
     JsonData=json.load(f)
    # print(JsonData)
-   # temp=enumerate(JsonData)
-    for i, value in (enumerate(JsonData)):
-         df= pd.DataFrame(JsonData)
-         df.to_csv("../csvRefOutput/" +reponame+".csv", mode='a', index=False, header=False)
-         f.close()
+    temp=enumerate(JsonData)
+    
+    df= pd.DataFrame(list(temp))
+    df.to_csv("../csvRefOutput/" +reponame+".csv", mode='a', index=False, header=False)
+    f.close()
 #user data
 username='muneeb-mbytes'
 path='/home/aniruddh/API/collector/csvRefOutput/'
